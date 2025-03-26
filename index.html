@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/2e16464fa5.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <header>
+      <div id="time-container">
+        <p id="time">Tid</p>
+        <p id="date">datum</p>
+      </div>
+    </header>
+    <main>
+      <h1 id="mainHeading">Min Dashboard</h1>
+      <div class="headContainer">
+        <div id="favLinks" class="contentContainer">
+          <h2>Snabblänkar</h2>
+          <div id="links" class="sub-container"></div>
+          <button id="addFavourite">
+            <span id="addIcon" class="fa-solid fa-circle-plus"></span>
+            <span id="addText">Lägg till länk</span>
+          </button>
+        </div>
+        <div id="weather" class="contentContainer">
+          <h2>Dagens väder</h2>
+          <div class="sub-container">Nu testar vi</div>
+        </div>
+        <div id="unknown" class="contentContainer">
+          <h2>[...]</h2>
+          <div class="sub-container"></div>
+        </div>
+        <div id="notes" class="contentContainer">
+          <h2>Anteckningar</h2>
+          <textarea name="notesCanvas" id="notesCanvas"></textarea>
+        </div>
+      </div>
+    </main>
+    <div class="modalContainer">
+      <form class="inputForm" id="addLinks">
+        <h2 class="formHeading">Lägg till favoritlänkar</h2>
+        <input
+          id="url"
+          class="formContent"
+          type="text"
+          placeholder="klistra in URL"
+          required
+        />
+        <input
+          id="linkName"
+          class="formContent"
+          type="text"
+          placeholder="Namn på din favorit"
+          required
+        />
+        <div class="form-actions">
+          <button type="submit" id="addLinkButton" class="formButton">
+            Lägg till favorit
+          </button>
+          <button id="cancelButton" class="formButton">Avbryt</button>
+        </div>
+      </form>
+    </div>
+    <footer>
+      <button id="selectBackground">Slumpa ny bakgrund</button>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
