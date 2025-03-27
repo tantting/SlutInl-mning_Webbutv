@@ -1,13 +1,11 @@
-console.log("Finns knappen?", document.querySelector("#addLinkButton"));
-
 document.addEventListener("DOMContentLoaded", function () {
   clock();
+  // randomBackGround();
   addNotes();
   changeHeading();
   favouriteLinks();
+  showWeatherData();
 });
-
-console.log("Script laddat!");
 
 //funktionality for writing text in notes
 const addNotes = () => {
@@ -43,6 +41,14 @@ function clock() {
   setInterval(updateDateTime, 1000);
 }
 
+// function randomBackGround() {
+//   const backGroundBtn = document.querySelector("selectBackground");
+
+//   backGroundBtn.addEventListener("click", () => {
+//       body.style.backgroundImage =
+//     });
+// }
+
 function changeHeading() {
   const heading = document.querySelector("#mainHeading");
 
@@ -69,71 +75,118 @@ function changeHeading() {
   });
 }
 
+const modalContainer = document.querySelector(".modalContainer");
+
+function closeModal() {
+  modalContainer.style.display = "none";
+}
+
 function favouriteLinks() {
   const startAddFavouriteBtn = document.querySelector("#addFavourite");
-  const modalContainer = document.querySelector(".modalContainer");
-  const inputForm = document.querySelector(".inputForm");
   const canselBtn = document.querySelector("#cancelButton");
   const addFavouriteBtn = document.querySelector("#addLinkButton");
 
-  function closeModal() {
-    modalContainer.style.display = "none";
-  }
-
-  //show the modal when clicking the add-button
+  //show the modal when clicking the add-button in the link container
   startAddFavouriteBtn.addEventListener("click", () => {
     modalContainer.style.display = "flex";
   });
 
-  //When klicking cansel - the modal does not show.
+  //When klicking cancel - the modal does not show.
   canselBtn.addEventListener("click", (e) => {
-    e.preventDefault;
+    e.preventDefault();
     closeModal();
   });
 
-  //When clicking outside the form-modal, the modal will close
-  // modalContainer.addEventListener("click", (e) => {
-  //   if (e.target !== inputForm) {
-  //     closeModal();
-  //   }
-  // });
+  //Event for creating favoutites when clicking the "add"-button in the form
+  addFavouriteBtn.addEventListener("click", (event) =>
+    createNewFavourite(event)
+  );
+}
+function createNewFavourite(event) {
+  event.preventDefault(); // Förhindra formulärets submit
+  event.stopPropagation(); // Förhindra att eventet "bubblar upp"
 
-  // const form = document.querySelector("#addLinks");
-  // form.addEventListener("submit", (e) => {
+  const url = document.querySelector("#url").value;
+  const linkName = document.querySelector("#linkName").value;
 
-  //   console.log("Submit event triggered");
-  //   e.preventDefault;
+  if (!url || !linkName) {
+    alert("Länk och/eller namn på länk saknas!");
+    return;
+  }
+  addNewLinkDiv(url, linkName);
+}
 
-  document
-    .querySelector("#addLinkButton")
-    .addEventListener("click", function (event) {
-      event.preventDefault(); // Förhindra formulärets submit
-      event.stopPropagation(); // Förhindra att eventet "bubblar upp"
+function addNewLinkDiv(url, linkName) {
+  const newFavourite = document.createElement("a");
 
-      console.log("Klick på knappen!");
+  const favIconURL = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${url}&size=64`;
 
-      const url = document.querySelector("#url").value;
-      const linkName = document.querySelector("#linkName").value;
+  newFavourite.innerHTML = `<div><img id="linkIcon" src="${favIconURL}" alt="${linkName}"><h3 id="linkTitle">${linkName}</h3></div><span class="edit fa-solid fa-pen-to-square"></span>`;
+  newFavourite.href = url;
+  newFavourite.target = "_blank"; //makesure the link is open in a new page
+  newFavourite.classList.add("fav-link");
 
-      if (!url || !linkName) {
-        console.log("Fält saknas!");
-        return;
-      }
+  document.querySelector("#links").appendChild(newFavourite);
 
-      const newFavourite = document.createElement("a");
+  closeModal();
 
-      newFavourite.textContent = linkName;
-      newFavourite.href = url;
-      newFavourite.target = "_blank"; //make sure the link is open in a new page
-      newFavourite.classList.add("fav-link");
+  const inputForm = document.querySelector(".inputForm");
 
-      // newFavourite.addEventListener(() => {
-      //   window.open(url, "blank");
-      // });
+  if (inputForm) {
+    inputForm.reset();
+  }
+}
 
-      document.querySelector("#links").appendChild(newFavourite);
-      console.log("Länk tillagd:", linkName, url);
-      // form.reset();
-      closeModal();
-    });
+function showWeatherData() {
+  const successCallback = (position) => {
+    console.log(position);
+
+    getWeatherData(position);
+  };
+
+  const errorCallback = (error) => {
+    const message =
+      "Väderdata kan inte visas om sidan inte har tillgång till position!";
+    console.error(error);
+    showError(message, "error-message");
+  };
+
+  //use the browsers geolocation api to get position
+  navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+}
+
+async function getWeatherData(position) {
+  console.log("i getWeather");
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+
+  console.log(longitude + " " + latitude);
+
+  const BASE_URL = "";
+  try {
+    const url = `${BASE_URL}?`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = response.json();
+    console.log(data);
+  } catch (error) {
+    console.error(`Error fetching weather data:"`, error);
+  }
+}
+
+function showError(message, elementID) {
+  console.log(`"#${elementID}"`);
+  const errorMessageContainer = document.querySelector(`#${elementID}`);
+
+  if (!errorMessageContainer) {
+    console.log("An element with given idea does not exisit");
+    return;
+  }
+
+  errorMessageContainer.textContent = message;
 }

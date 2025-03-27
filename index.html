@@ -36,7 +36,9 @@
         </div>
         <div id="weather" class="contentContainer">
           <h2>Dagens väder</h2>
-          <div class="sub-container">Nu testar vi</div>
+          <div class="sub-container">
+            <i id="error-message"></i>
+          </div>
         </div>
         <div id="unknown" class="contentContainer">
           <h2>[...]</h2>
@@ -53,17 +55,17 @@
         <h2 class="formHeading">Lägg till favoritlänkar</h2>
         <input
           id="url"
+          name="url"
           class="formContent"
           type="text"
           placeholder="klistra in URL"
-          required
         />
         <input
           id="linkName"
+          name="link"
           class="formContent"
           type="text"
           placeholder="Namn på din favorit"
-          required
         />
         <div class="form-actions">
           <button type="submit" id="addLinkButton" class="formButton">
@@ -76,6 +78,7 @@
     <footer>
       <button id="selectBackground">Slumpa ny bakgrund</button>
     </footer>
+    <script src="keys.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
