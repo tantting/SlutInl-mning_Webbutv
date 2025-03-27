@@ -134,6 +134,14 @@ h2 {
     -o-border-radius: 10px;
 }
 
+.newContents {
+    background-color: rgba(239, 243, 240, 0.6);
+    width: 90%;
+    height: auto;
+    margin: 0.2em 0;
+    border-radius: 10px;
+}
+
 #addFavourite {
     background-color: rgba(111, 113, 111, 0.7);
     height: 1.5rem;
@@ -254,20 +262,16 @@ color: rgba(223, 228, 224, 0.95);
     align-items: center;
 }
 
+/* Common styles for the containers of new content (links, weather etc) is shared in a newContent-klass further upin the" */
 .fav-link {
-    background-color: rgba(239, 243, 240, 0.6);
-    width: 90%;
-    height: 15%;
-    margin: 0.2em 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     -ms-border-radius: 10px;
     -o-border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
     text-decoration: none;
 }
 

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   addNotes();
   changeHeading();
   favouriteLinks();
-  showWeatherData();
+  getWeatherData();
 });
 
 //funktionality for writing text in notes
@@ -124,7 +124,7 @@ function addNewLinkDiv(url, linkName) {
   newFavourite.innerHTML = `<div><img id="linkIcon" src="${favIconURL}" alt="${linkName}"><h3 id="linkTitle">${linkName}</h3></div><span class="edit fa-solid fa-pen-to-square"></span>`;
   newFavourite.href = url;
   newFavourite.target = "_blank"; //makesure the link is open in a new page
-  newFavourite.classList.add("fav-link");
+  newFavourite.classList.add("fav-link", "newContents");
 
   document.querySelector("#links").appendChild(newFavourite);
 
@@ -137,56 +137,92 @@ function addNewLinkDiv(url, linkName) {
   }
 }
 
-function showWeatherData() {
-  const successCallback = (position) => {
-    console.log(position);
+async function showWeatherData() {
+  try {
+    const apiTypes = ["current.json", "forecast.json"];
 
-    getWeatherData(position);
-  };
+    // Get the coordinates.
+    const coordinates = await getCoordinates();
+    if (!coordinates) {
+      throw new Error("Misslyckades med att hämta koordinater.");
+    }
 
-  const errorCallback = (error) => {
-    const message =
-      "Väderdata kan inte visas om sidan inte har tillgång till position!";
-    console.error(error);
-    showError(message, "error-message");
-  };
+    // Use Promise.all() to fetch data for both current weather and forecast at once.
+    // Promice.all() let me do async operations in paralell and wait for all to be done
+    // before continuing. Promise.all() receives an array of Promises and returns a promise
+    // that is resolve if all promises are ready and reject if any of them fail.
+    const dataArray = await Promise.all(
+      apiTypes.map((apiType) =>
+        getDataObject(coordinates[0], coordinates[1], apiType)
+      )
+    );
 
-  //use the browsers geolocation api to get position
-  navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    console.log(dataArray);
+
+    // Loop through the result and display weather data with different
+    // functions (one for current weather and one for forecast that is a bit different)
+    dataArray.forEach((data) => {
+      if (data && data.current) {
+        showCurrentWeather(data);
+      } else if (data && data.forecast) {
+        showForecast(data);
+      }
+    });
+  } catch (error) {
+    console.error("Fel i showWeatherData:", error.message);
+    showError("Vi har dessvärre problem med vår hämtning av data :(");
+  }
 }
 
-async function getWeatherData(position) {
-  console.log("i getWeather");
-  const latitude = position.coords.latitude;
-  const longitude = position.coords.longitude;
+function getCoordinates() {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (position) =>
+        resolve([position.coords.latitude, position.coords.longitude]),
+      (error) => {
+        console.error(error);
+        showError(
+          "Väderdata kan inte visas om sidan inte har tillgång till position!"
+        );
+        reject(error);
+      }
+    );
+  });
+}
 
-  console.log(longitude + " " + latitude);
-
-  const BASE_URL = "";
+async function getDataObject(latitude, longitude, apiType) {
   try {
-    const url = `${BASE_URL}?`;
+    const BASE_URL = "http://api.weatherapi.com/v1";
+    const api_key = API_KEYS.weather;
+    const url = `${BASE_URL}/${apiType}?key=${api_key}&q=${latitude},${longitude}`;
 
     const response = await fetch(url);
-
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const data = response.json();
-    console.log(data);
+    return await response.json();
   } catch (error) {
-    console.error(`Error fetching weather data:"`, error);
+    console.error(`Error fetching ${apiType} weather data:`, error);
+    return null;
   }
 }
 
-function showError(message, elementID) {
-  console.log(`"#${elementID}"`);
+// A function for displaying current weather
+function showCurrentWeather(data) {
+  console.log("Nuvarande väder:", data);
+  // Lägg till kod!
+}
+
+// A function for displaying forecasts
+function showForecast(data) {
+  console.log("Väderprognos:", data);
+  // Lägg till kod
+}
+
+function showError(message, elementID = "error-message") {
   const errorMessageContainer = document.querySelector(`#${elementID}`);
-
-  if (!errorMessageContainer) {
-    console.log("An element with given idea does not exisit");
-    return;
+  if (errorMessageContainer) {
+    errorMessageContainer.textContent = message;
   }
-
-  errorMessageContainer.textContent = message;
 }
