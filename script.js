@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   addNotes();
   changeHeading();
   favouriteLinks();
-  getWeatherData();
+  showWeatherData();
 });
 
 //funktionality for writing text in notes
@@ -210,8 +210,19 @@ async function getDataObject(latitude, longitude, apiType) {
 
 // A function for displaying current weather
 function showCurrentWeather(data) {
-  console.log("Nuvarande väder:", data);
-  // Lägg till kod!
+  const weatherContainer = document.querySelector("#weatherContainer");
+  const weatherDiv = document.createElement("div");
+  weatherDiv.classList.add("newContents", "weatherDisplay");
+
+  weatherDiv.innerHTML = `
+      <img class="weatherIcon" src="${data.current.condition.icon}" alt="${data.current.condition.text}">
+      <div>
+      <h3 class="Just nu"></h3>
+      <div>
+        <p>${data.current.temp_c}°C</p><p>${data.current.condition.text}</p>
+      </div>
+      </div>`;
+  weatherContainer.appendChild(weatherDiv);
 }
 
 // A function for displaying forecasts
@@ -219,6 +230,14 @@ function showForecast(data) {
   console.log("Väderprognos:", data);
   // Lägg till kod
 }
+
+// //use icons from https://erikflowers.github.io/weather-icons/
+// function getWeatherIcon(data) {
+
+//   const dayTime = data.is_day;
+//   const weather =
+//   const weatherString = `wi-${daytime ? day : night}-{weather}`;
+//  }
 
 function showError(message, elementID = "error-message") {
   const errorMessageContainer = document.querySelector(`#${elementID}`);
