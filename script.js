@@ -139,35 +139,17 @@ function addNewLinkDiv(url, linkName) {
 
 async function showWeatherData() {
   try {
-    const apiTypes = ["current.json", "forecast.json"];
-
     // Get the coordinates.
     const coordinates = await getCoordinates();
     if (!coordinates) {
       throw new Error("Misslyckades med att hämta koordinater.");
     }
 
-    // Use Promise.all() to fetch data for both current weather and forecast at once.
-    // Promice.all() let me do async operations in paralell and wait for all to be done
-    // before continuing. Promise.all() receives an array of Promises and returns a promise
-    // that is resolve if all promises are ready and reject if any of them fail.
-    const dataArray = await Promise.all(
-      apiTypes.map((apiType) =>
-        getDataObject(coordinates[0], coordinates[1], apiType)
-      )
-    );
+    const data = await getDataObject(coordinates[0], coordinates[1]);
 
-    console.log(dataArray);
+    console.log(data);
 
-    // Loop through the result and display weather data with different
-    // functions (one for current weather and one for forecast that is a bit different)
-    dataArray.forEach((data) => {
-      if (data && data.current) {
-        showCurrentWeather(data);
-      } else if (data && data.forecast) {
-        showForecast(data);
-      }
-    });
+    showForecast(data);
   } catch (error) {
     console.error("Fel i showWeatherData:", error.message);
     showError("Vi har dessvärre problem med vår hämtning av data :(");
@@ -190,11 +172,13 @@ function getCoordinates() {
   });
 }
 
-async function getDataObject(latitude, longitude, apiType) {
+async function getDataObject(latitude, longitude) {
   try {
+    const weatherContainer = document.querySelector("#weatherContainer");
+    weatherContainer.innerHTML = `<p>Laddar väderdata!</>`;
     const BASE_URL = "http://api.weatherapi.com/v1";
     const api_key = API_KEYS.weather;
-    const url = `${BASE_URL}/${apiType}?key=${api_key}&q=${latitude},${longitude}`;
+    const url = `${BASE_URL}/forecast.json?key=${api_key}&q=${latitude},${longitude}&days=4`;
 
     const response = await fetch(url);
     if (!response.ok) {
@@ -208,36 +192,62 @@ async function getDataObject(latitude, longitude, apiType) {
   }
 }
 
-// A function for displaying current weather
-function showCurrentWeather(data) {
-  const weatherContainer = document.querySelector("#weatherContainer");
-  const weatherDiv = document.createElement("div");
-  weatherDiv.classList.add("newContents", "weatherDisplay");
-
-  weatherDiv.innerHTML = `
-      <img class="weatherIcon" src="${data.current.condition.icon}" alt="${data.current.condition.text}">
-      <div>
-      <h3 class="Just nu"></h3>
-      <div>
-        <p>${data.current.temp_c}°C</p><p>${data.current.condition.text}</p>
-      </div>
-      </div>`;
-  weatherContainer.appendChild(weatherDiv);
-}
-
 // A function for displaying forecasts
 function showForecast(data) {
-  console.log("Väderprognos:", data);
-  // Lägg till kod
+  const weatherContainer = document.querySelector("#weatherContainer");
+  weatherContainer.innerHTML = ``;
+
+  for (let i = 0; i <= 2; i++) {
+    const weatherDiv = document.createElement("div");
+    weatherDiv.classList.add("newContents", "weatherDisplay");
+
+    const forecastDay = data.forecast.forecastday[i];
+    const displayDay = getWeekDay(forecastDay.date);
+
+    // if (i === 1) {
+    //   displayDay = "Imorgon";
+    // } else {
+    //   displayDay = getWeekDay(forecastDay.date);
+    // }
+
+    weatherDiv.innerHTML = `
+      <img class="weatherIcon" src="${forecastDay.day.condition.icon}" alt="${forecastDay.day.condition.text}">
+      <div>
+          <h3>${displayDay}</h3>
+      <div>
+           <p>${forecastDay.day.maxtemp_c}°C</p>
+           <p>${forecastDay.day.condition.text}</p>
+      </div>
+      </div>`;
+    weatherContainer.appendChild(weatherDiv);
+  }
+
+  function getWeekDay(dateString) {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    //creates an array of weekdays to show
+    const weekdays = [
+      "Söndag",
+      "Måndag",
+      "Tisdag",
+      "Onsdag",
+      "Torsdag",
+      "Fredag",
+      "Lördag",
+    ];
+
+    if (date.toDateString() === today.toDateString()) {
+      return "Just nu";
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return "Imorgon";
+    } else {
+      return weekdays[date.getDay()];
+    }
+  }
 }
-
-// //use icons from https://erikflowers.github.io/weather-icons/
-// function getWeatherIcon(data) {
-
-//   const dayTime = data.is_day;
-//   const weather =
-//   const weatherString = `wi-${daytime ? day : night}-{weather}`;
-//  }
 
 function showError(message, elementID = "error-message") {
   const errorMessageContainer = document.querySelector(`#${elementID}`);

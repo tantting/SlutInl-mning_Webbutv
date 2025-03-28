@@ -37,7 +37,7 @@ main {
     height: 19.2rem;
     background-color:rgba(223, 228, 224, 0.6);
     margin: 0.5rem;
-    padding: 1rem; 
+    padding: 0.7rem; 
     border-radius: 5%;
     -webkit-border-radius: 5%;
     -moz-border-radius: 5%;
@@ -137,7 +137,7 @@ h2 {
 
 .newContents {
     background-color: rgba(239, 243, 240, 0.6);
-    width: 90%;
+    width: 100%;
     height: auto;
     margin: 0.2em 0;
     border-radius: 10px;
@@ -269,6 +269,7 @@ color: rgba(223, 228, 224, 0.95);
     -moz-border-radius: 10px;
     -ms-border-radius: 10px;
     -o-border-radius: 10px;
+    width: 90%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -313,3 +314,35 @@ color: rgba(223, 228, 224, 0.95);
     text-wrap: wrap;
     font-size: smaller;
 }
+
+.weatherDisplay {
+    display: flex;
+}
+
+.weatherDisplay div{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 1em 0 0.5em;
+}
+.weatherDisplay img{
+    width: 4em;;
+    height: auto;
+}
+.weatherDisplay div h3 {
+    font-size: 0.7em;
+    font-weight: bold;
+    margin: 1em 0 0 0;
+}
+.weatherDisplay div div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+}
+.weatherDisplay div div p{
+    font-size: 0.8em;
+    margin: 0.5em 0; 
+}
+
