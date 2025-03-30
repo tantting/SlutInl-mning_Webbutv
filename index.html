@@ -40,13 +40,13 @@
             <i id="error-message"></i>
           </div>
         </div>
-        <div id="unknown" class="contentContainer">
-          <h2>[...]</h2>
-          <div class="sub-container"></div>
+        <div id="recipeInspo" class="contentContainer">
+          <h2>Dagens recept</h2>
+          <div id="recipeSubContainer" class="sub-container"></div>
         </div>
-        <div id="notes" class="contentContainer">
+        <div id="notesContainer" class="contentContainer">
           <h2>Anteckningar</h2>
-          <textarea name="notesCanvas" id="notesCanvas"></textarea>
+          <textarea name="notes" id="notes"></textarea>
         </div>
       </div>
     </main>
@@ -74,9 +74,18 @@
           <button id="cancelButton" class="formButton">Avbryt</button>
         </div>
       </form>
+      <input
+        type="textarea"
+        id="notesCanvas"
+        placeholder="Skriv dina anteckningar här..."
+      />
     </div>
     <footer>
-      <button id="selectBackground">Slumpa ny bakgrund</button>
+      <div id="footerDiv">
+        <div></div>
+        <button id="selectBackground">Slumpa ny bakgrund</button>
+        <i id="credit"></i>
+      </div>
     </footer>
     <script src="keys.js"></script>
     <script src="script.js"></script>

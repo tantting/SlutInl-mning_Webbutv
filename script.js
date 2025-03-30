@@ -1,19 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
   clock();
-  // randomBackGround();
-  addNotes();
+  randomBackGround();
+  notes();
   changeHeading();
   favouriteLinks();
   showWeatherData();
+  randomRecipe();
 });
-
-//funktionality for writing text in notes
-const addNotes = () => {
-  const canvas = document.querySelector("#notesCanvas");
-  canvas.addEventListener("input", function (event) {
-    canvas.innerText = event.innerText;
-  });
-};
 
 function clock() {
   function updateDateTime() {
@@ -41,13 +34,47 @@ function clock() {
   setInterval(updateDateTime, 1000);
 }
 
-// function randomBackGround() {
-//   const backGroundBtn = document.querySelector("selectBackground");
+function randomBackGround() {
+  const backGroundBtn = document.querySelector("#selectBackground");
 
-//   backGroundBtn.addEventListener("click", () => {
-//       body.style.backgroundImage =
-//     });
-// }
+  backGroundBtn.addEventListener("click", () => getRandomImage());
+}
+
+async function getRandomImage() {
+  const url = `https://api.unsplash.com//photos/random/?client_id=${API_KEYS.unsplashed.accessKey}`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Kan inte hämta data från API: ${response.status}`);
+    }
+    const data = await response.json();
+
+    displayNewBackground(data);
+
+    console.log(data);
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+function displayNewBackground(data) {
+  //Fetch image info:
+  const imageURL = data.urls.regular;
+  const altDesc = data.alt_description;
+  const photographer = data.user.name;
+  const profileURL = data.links.html;
+
+  //Updating background image
+  document.body.style.backgroundImage = `url(${imageURL})`;
+  document.body.setAttribute("aria-label", altDesc);
+
+  const creditPhotog = document.querySelector("#credit");
+
+  //Credit to photographer. target= "_blank" makes the url open in a new window
+  creditPhotog.innerHTML = `Bakgrundsfoto av: <a href="${profileURL}" target="_blank" >${photographer}</a> via Unsplashed`;
+}
 
 function changeHeading() {
   const heading = document.querySelector("#mainHeading");
@@ -74,7 +101,6 @@ function changeHeading() {
     });
   });
 }
-
 const modalContainer = document.querySelector(".modalContainer");
 
 function closeModal() {
@@ -82,6 +108,7 @@ function closeModal() {
 }
 
 function favouriteLinks() {
+  const inputForm = document.querySelector("#addLinks");
   const startAddFavouriteBtn = document.querySelector("#addFavourite");
   const canselBtn = document.querySelector("#cancelButton");
   const addFavouriteBtn = document.querySelector("#addLinkButton");
@@ -89,6 +116,7 @@ function favouriteLinks() {
   //show the modal when clicking the add-button in the link container
   startAddFavouriteBtn.addEventListener("click", () => {
     modalContainer.style.display = "flex";
+    inputForm.style.display = "flex";
   });
 
   //When klicking cancel - the modal does not show.
@@ -121,7 +149,12 @@ function addNewLinkDiv(url, linkName) {
 
   const favIconURL = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${url}&size=64`;
 
-  newFavourite.innerHTML = `<div><img id="linkIcon" src="${favIconURL}" alt="${linkName}"><h3 id="linkTitle">${linkName}</h3></div><span class="edit fa-solid fa-pen-to-square"></span>`;
+  newFavourite.innerHTML = `
+      <div>
+        <img id="linkIcon" src="${favIconURL}" alt="${linkName}">
+        <h3 id="linkTitle">${linkName}</h3>
+      </div>
+      <span class="edit fa-solid fa-pen-to-square"></span>`;
   newFavourite.href = url;
   newFavourite.target = "_blank"; //makesure the link is open in a new page
   newFavourite.classList.add("fav-link", "newContents");
@@ -130,10 +163,62 @@ function addNewLinkDiv(url, linkName) {
 
   closeModal();
 
-  const inputForm = document.querySelector(".inputForm");
-
   if (inputForm) {
     inputForm.reset();
+  }
+}
+
+//funktionality for writing text in notes
+function notes() {
+  const notesCanvas = document.querySelector("#notesCanvas");
+  const notesDiv = document.querySelector("#notes");
+
+  //notes, if there are any, will be saved to localStorage
+  const savedNotes = localStorage.getItem("dashboardNotes" || "");
+
+  //if there are notes in localStorage when starting, it will be displayed in notesCanvas
+  notesCanvas.value = savedNotes;
+
+  updateNotesPreview();
+
+  //Event-listnere that display the  notesCanvas when clicking on notesDiv.
+  notesDiv.addEventListener("click", function (event) {
+    // use the same modalContainer as for display addLinksForm above.
+    modalContainer.style.display = "flex";
+    notesCanvas.style.display = "block";
+    notesCanvas.focus();
+  });
+
+  //if the user clicks outside the notesCanvas, the notes canvas will be closed and notes saved.
+  modalContainer.addEventListener("click", function (event) {
+    if (event.taget === modalContainer) {
+      //save notes and hide the modalContainer and canvas again
+      saveNotes();
+      modalContainer.style.display = "none";
+      notesCanvas.style.display = "none";
+    }
+  });
+
+  function saveNotes() {
+    localStorage("dashboardNotes", notesCanvas.value);
+    updateNotesPreview;
+  }
+
+  function updateNotesPreview() {
+    const fullText = notesCanvas.value;
+    // Extract the first row, or parts of it if it is to long
+    const firstLine = fullText.split("\n")[0] || "";
+    const preview =
+      firstLine.length > 30 ? firstLine.substring(0, 30) + "..." : firstLine;
+
+    // Display a sign that there is more text, if there are  is....
+    const hasMoreText =
+      fullText.includes("\n") || fullText.length > preview.length;
+
+    notesDiv.value = preview + (hasMoreText ? " [...]" : "");
+
+    // Alternativt, om du vill ha stiliserad förhandsvisning med HTML (ej med textarea):
+    // notesDiv.innerHTML = `<p>${preview}</p>${hasMoreText ? '<span class="more-indicator">...</span>' : ''}`;
   }
 }
 
@@ -184,7 +269,6 @@ async function getDataObject(latitude, longitude) {
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-
     return await response.json();
   } catch (error) {
     console.error(`Error fetching ${apiType} weather data:`, error);
@@ -216,7 +300,7 @@ function showForecast(data) {
           <h3>${displayDay}</h3>
       <div>
            <p>${forecastDay.day.maxtemp_c}°C</p>
-           <p>${forecastDay.day.condition.text}</p>
+           <p class="forecastText">${forecastDay.day.condition.text}</p>
       </div>
       </div>`;
     weatherContainer.appendChild(weatherDiv);
@@ -254,4 +338,41 @@ function showError(message, elementID = "error-message") {
   if (errorMessageContainer) {
     errorMessageContainer.textContent = message;
   }
+}
+
+async function randomRecipe() {
+  const url = `https://api.spoonacular.com/recipes/random?number=1&apiKey=${API_KEYS.recipe2}&tags=vegetarian`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Could not fetch data: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    console.log(data);
+    displayRecipe(data);
+  } catch (error) {
+    console.error("Problems fetching data", error.message);
+  }
+}
+
+function displayRecipe(data) {
+  const recipe = data.recipes[0];
+  const imageURL = recipe.image;
+  const title = recipe.title;
+  const recipeURL = recipe.sourceUrl;
+
+  const recipeContainer = document.querySelector("#recipeSubContainer");
+  console.log(recipeContainer);
+
+  recipeContainer.innerHTML = `<a href="${recipeURL}"><h3>${title}</h3> <img src="${imageURL}" alt="picture of ${title}"></a>`;
 }
