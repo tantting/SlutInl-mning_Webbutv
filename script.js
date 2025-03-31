@@ -102,16 +102,25 @@ function changeHeading() {
   });
 }
 const modalContainer = document.querySelector(".modalContainer");
+const inputForm = document.querySelector("#addLinks");
+const favLinksDiv = document.querySelector("#links");
+
+// function saveLinks() {
+//   localStorage.setItem("favouriteLinks", favLinksDiv.value);
+// }
 
 function closeModal() {
   modalContainer.style.display = "none";
+  inputForm.style.display = "none";
 }
 
 function favouriteLinks() {
-  const inputForm = document.querySelector("#addLinks");
   const startAddFavouriteBtn = document.querySelector("#addFavourite");
   const canselBtn = document.querySelector("#cancelButton");
   const addFavouriteBtn = document.querySelector("#addLinkButton");
+
+  //if there are any saved notes in localStorage, they will be fetched.
+  favLinksDiv.value = localStorage.getItem("favoutiteLinks" || "");
 
   //show the modal when clicking the add-button in the link container
   startAddFavouriteBtn.addEventListener("click", () => {
@@ -159,7 +168,9 @@ function addNewLinkDiv(url, linkName) {
   newFavourite.target = "_blank"; //makesure the link is open in a new page
   newFavourite.classList.add("fav-link", "newContents");
 
-  document.querySelector("#links").appendChild(newFavourite);
+  favLinksDiv.appendChild(newFavourite);
+
+  localStorage.setItem("favouriteLinks", favLinksDiv.value);
 
   closeModal();
 
@@ -170,14 +181,16 @@ function addNewLinkDiv(url, linkName) {
 
 //funktionality for writing text in notes
 function notes() {
+  const modalContainer = document.querySelector(".modalContainer");
   const notesCanvas = document.querySelector("#notesCanvas");
   const notesDiv = document.querySelector("#notes");
 
-  //notes, if there are any, will be saved to localStorage
-  const savedNotes = localStorage.getItem("dashboardNotes" || "");
+  //notes, if there are any, will be fetched from localStorage
+  const savedNotes = localStorage.getItem("dashboardNotes") || "";
 
   //if there are notes in localStorage when starting, it will be displayed in notesCanvas
   notesCanvas.value = savedNotes;
+  console.log(notesCanvas.value);
 
   updateNotesPreview();
 
@@ -189,36 +202,21 @@ function notes() {
     notesCanvas.focus();
   });
 
-  //if the user clicks outside the notesCanvas, the notes canvas will be closed and notes saved.
-  modalContainer.addEventListener("click", function (event) {
-    if (event.taget === modalContainer) {
-      //save notes and hide the modalContainer and canvas again
-      saveNotes();
-      modalContainer.style.display = "none";
-      notesCanvas.style.display = "none";
-    }
+  //An event-listner that makes sure the nots are always saved.
+  notesCanvas.addEventListener("input", () => {
+    localStorage.setItem("dashboardNotes", notesCanvas.value);
   });
 
-  function saveNotes() {
-    localStorage("dashboardNotes", notesCanvas.value);
-    updateNotesPreview;
-  }
+  notesCanvas.addEventListener("blur", () => {
+    // When the user leaves the notesCanvas-area, the notesDiv is updated and the modal is closed.
+    updateNotesPreview();
+    modalContainer.style.display = "none";
+    notesCanvas.style.display = "none";
+  });
 
   function updateNotesPreview() {
-    const fullText = notesCanvas.value;
-    // Extract the first row, or parts of it if it is to long
-    const firstLine = fullText.split("\n")[0] || "";
-    const preview =
-      firstLine.length > 30 ? firstLine.substring(0, 30) + "..." : firstLine;
-
-    // Display a sign that there is more text, if there are  is....
-    const hasMoreText =
-      fullText.includes("\n") || fullText.length > preview.length;
-
-    notesDiv.value = preview + (hasMoreText ? " [...]" : "");
-
-    // Alternativt, om du vill ha stiliserad förhandsvisning med HTML (ej med textarea):
-    // notesDiv.innerHTML = `<p>${preview}</p>${hasMoreText ? '<span class="more-indicator">...</span>' : ''}`;
+    notesDiv.textContent = notesCanvas.value;
+    console.log(notesDiv.value);
   }
 }
 

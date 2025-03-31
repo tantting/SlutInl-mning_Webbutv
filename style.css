@@ -389,6 +389,7 @@ color: rgba(223, 228, 224, 0.95);
 #notesCanvas {
     display: none;
     width: 80%;
+    max-width: 800px;
     height: 80%;
     background-color: rgba(223, 228, 224, 0.6);
     overflow-y: auto;
