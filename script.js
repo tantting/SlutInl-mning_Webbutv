@@ -120,7 +120,7 @@ function favouriteLinks() {
   const addFavouriteBtn = document.querySelector("#addLinkButton");
 
   //if there are any saved notes in localStorage, they will be fetched.
-  favLinksDiv.value = localStorage.getItem("favoutiteLinks" || "");
+  loadFavouriteLinks();
 
   //show the modal when clicking the add-button in the link container
   startAddFavouriteBtn.addEventListener("click", () => {
@@ -150,6 +150,14 @@ function createNewFavourite(event) {
     alert("Länk och/eller namn på länk saknas!");
     return;
   }
+  //fetched links saved in LocalStorage if there are any
+  const savedLinks = JSON.parse(localStorage.getItem("favouriteLinks")) || [];
+  //att the new link to the array of links
+  savedLinks.push({ url, linkName });
+  //save the updated array of links to localStrage
+  localStorage.setItem("favouriteLinks", JSON.stringify(savedLinks));
+
+  //Updating DOM with the new link.
   addNewLinkDiv(url, linkName);
 }
 
@@ -170,12 +178,38 @@ function addNewLinkDiv(url, linkName) {
 
   favLinksDiv.appendChild(newFavourite);
 
-  localStorage.setItem("favouriteLinks", favLinksDiv.value);
-
   closeModal();
 
   if (inputForm) {
     inputForm.reset();
+  }
+}
+
+function loadFavouriteLinks() {
+  //makes sure favLinksDiv is empty before rending links from localStorage
+  favLinksDiv.innerHTML = "";
+
+  const storedLinks = localStorage.getItem("favouriteLinks");
+
+  if (!storedLinks) {
+    console.warn("Finns inga sparade länkar i localStorage");
+    return;
+  }
+
+  try {
+    const savedLinks = JSON.parse(storedLinks);
+
+    if (!Array.isArray(savedLinks)) {
+      throw new Error("Fel format i localStorage");
+    }
+
+    //for each array-item of links and name - a new link-div is rendered.
+    savedLinks.forEach(({ url, linkName }) => {
+      addNewLinkDiv(url, linkName);
+    });
+  } catch (error) {
+    console.error("Kunde inte ladda länkar från localStorage:", error);
+    localStorage.removeItem("favouriteLinks"); // Erase "korrupt" data
   }
 }
 
