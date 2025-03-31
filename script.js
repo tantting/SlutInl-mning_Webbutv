@@ -223,10 +223,13 @@ function notes() {
   const savedNotes = localStorage.getItem("dashboardNotes") || "";
 
   //if there are notes in localStorage when starting, it will be displayed in notesCanvas
-  notesCanvas.value = savedNotes;
-  console.log(notesCanvas.value);
+  notesCanvas.innerText = savedNotes;
 
   updateNotesPreview();
+
+  //had problems with textarea not working ok. Use contenteditable-div instead. For
+  //that, I need to add a placeholder "manually".
+  handlePlaceholder();
 
   //Event-listnere that display the  notesCanvas when clicking on notesDiv.
   notesDiv.addEventListener("click", function (event) {
@@ -238,7 +241,7 @@ function notes() {
 
   //An event-listner that makes sure the nots are always saved.
   notesCanvas.addEventListener("input", () => {
-    localStorage.setItem("dashboardNotes", notesCanvas.value);
+    localStorage.setItem("dashboardNotes", notesCanvas.innerText);
   });
 
   notesCanvas.addEventListener("blur", () => {
@@ -249,9 +252,34 @@ function notes() {
   });
 
   function updateNotesPreview() {
-    notesDiv.textContent = notesCanvas.value;
-    console.log(notesDiv.value);
+    notesDiv.innerHTML = notesCanvas.innerHTML;
   }
+}
+
+function handlePlaceholder() {
+  const notesCanvas = document.getElementById("notesCanvas");
+
+  // Add a placeholder if div is empty
+  function setPlaceholder() {
+    if (notesCanvas.innerText.trim() === "") {
+      notesCanvas.innerHTML =
+        "<span style='color: gray;'>Skriv dina anteckningar här...</span>";
+    }
+  }
+
+  // Remove placeholder when user start typing
+  notesCanvas.addEventListener("focus", function () {
+    // If a placeholder is visble - remove it
+    if (notesCanvas.innerText.trim() === "Skriv dina anteckningar här...") {
+      notesCanvas.innerHTML = "";
+    }
+  });
+
+  // Lägg till placeholder om det blir tomt igen när användaren inte är fokuserad
+  notesCanvas.addEventListener("blur", setPlaceholder);
+
+  // Kör funktionen när sidan laddas för att säkerställa att placeholder sätts korrekt
+  setPlaceholder();
 }
 
 async function showWeatherData() {

@@ -46,7 +46,7 @@
         </div>
         <div id="notesContainer" class="contentContainer">
           <h2>Anteckningar</h2>
-          <textarea name="notes" id="notes"></textarea>
+          <div id="notes"></div>
         </div>
       </div>
     </main>
@@ -74,11 +74,13 @@
           <button id="cancelButton" class="formButton">Avbryt</button>
         </div>
       </form>
-      <input
+      <!-- problem med min textarea, så testar contenteditable div istället -->
+      <!-- <input
         type="textarea"
         id="notesCanvas"
         placeholder="Skriv dina anteckningar här..."
-      />
+      /> -->
+      <div id="notesCanvas" contenteditable="true"></div>
     </div>
     <footer>
       <div id="footerDiv">

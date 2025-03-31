@@ -134,10 +134,15 @@ flex: 1;
 }
 
 #selectBackground {
+    position: fixed; /* positon the button fixed in the bottom ov the page */
+    bottom: 20px;
+    left: 50%; /* Place the button in the middle and adjust for the size of the button with transform*/
+    transform: translateX(-50%);
     background-color: rgba(223, 228, 224, 0.6);
     backdrop-filter: blur(2px);
     color: rgb(10, 26, 13);
-    margin: 1rem;
+    padding: 0;
+    margin: 0;
     height: 1.5rem;
     padding: 0 1rem;
     font-size: 0.7em;
@@ -150,7 +155,9 @@ flex: 1;
 }
 
 #footerDiv #credit {
-    flex: 1; 
+    position: absolute;
+    right: 10px;
+    bottom: 5px;
     color: rgba(223, 228, 224, 0.95);
     font-size: 0.7em;
     font-style: italic;
@@ -372,7 +379,7 @@ color: rgba(223, 228, 224, 0.95);
 
 #notes {
     flex: 1;
-    width: 100%;
+    width: 90%;
     background-color: rgba(223, 228, 224, 0.6);
     border-style: none;
     margin: 0 1em 1em 1em;
@@ -384,6 +391,7 @@ color: rgba(223, 228, 224, 0.95);
     text-wrap: wrap;
     font-size: smaller;
     white-space: pre-wrap;
+    padding: 1em; 
 }
 
 #notesCanvas {
@@ -400,12 +408,12 @@ color: rgba(223, 228, 224, 0.95);
     vertical-align: top;
     text-align: left;
     white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 
-#notesCanvas::placeholder {
-    position: absolute;
-    top: 1em;
-    left: 1em;
+#notesCanvas::span {
+    color: lightgrey;
+    font-style: italic;
 }
 
 #recipeSubContainer a {
