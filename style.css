@@ -121,16 +121,7 @@ h2 {
 
 footer {
     width: 100%;
-}
-
-#footerDiv{
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-}
-#footerDiv div{
-flex: 1; 
 }
 
 #selectBackground {
@@ -154,18 +145,18 @@ flex: 1;
     -o-border-radius: 10px;
 }
 
-#footerDiv #credit {
+#credit {
     position: absolute;
     right: 10px;
     bottom: 5px;
     color: rgba(223, 228, 224, 0.95);
-    font-size: 0.7em;
+    font-size: 0.7em;   
     font-style: italic;
     text-align: end;
     padding: 0 1rem 0 0;
     text-decoration: none;
 }
-#footerDiv #credit a {
+#credit a {
     color: rgba(223, 228, 224, 0.95);
 }
 

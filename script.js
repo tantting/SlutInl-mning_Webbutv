@@ -262,8 +262,7 @@ function handlePlaceholder() {
   // Add a placeholder if div is empty
   function setPlaceholder() {
     if (notesCanvas.innerText.trim() === "") {
-      notesCanvas.innerHTML =
-        "<span style='color: gray;'>Skriv dina anteckningar här...</span>";
+      notesCanvas.innerHTML = "<span>Skriv dina anteckningar här...</span>";
     }
   }
 
