@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   clock();
+  displayNewBackground();
   randomBackGround();
   notes();
   changeHeading();
@@ -41,7 +42,7 @@ function randomBackGround() {
 }
 
 async function getRandomImage() {
-  const url = `https://api.unsplash.com//photos/random/?client_id=${API_KEYS.unsplashed.accessKey}`;
+  const url = `https://api.unsplash.com/photos/random/?client_id=${API_KEYS.unsplashed.accessKey}`;
 
   try {
     const response = await fetch(url);
@@ -51,7 +52,8 @@ async function getRandomImage() {
     }
     const data = await response.json();
 
-    displayNewBackground(data);
+    saveNewBackground(data);
+    displayNewBackground();
 
     console.log(data);
   } catch (error) {
@@ -59,12 +61,32 @@ async function getRandomImage() {
   }
 }
 
-function displayNewBackground(data) {
+function saveNewBackground(data) {
   //Fetch image info:
   const imageURL = data.urls.regular;
   const altDesc = data.alt_description;
   const photographer = data.user.name;
   const profileURL = data.links.html;
+
+  const imageObject = { imageURL, altDesc, photographer, profileURL };
+
+  //save Imageobject to localStorage
+  localStorage.setItem("backgroundImageObject", JSON.stringify(imageObject));
+}
+
+function displayNewBackground() {
+  //Fetch imageObject from localStorage if there is any
+  const savedImage = JSON.parse(localStorage.getItem("backgroundImageObject"));
+  console.log(savedImage);
+
+  //In case there is no image in localStorage, a fallbackImage is used.
+  const fallbackImage =
+    "https://images.unsplash.com/photo-1476231682828-37e571bc172f?q=80&w=3174&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  const imageURL = savedImage?.imageURL || fallbackImage;
+  const altDesc = savedImage?.altDesc || "Unknown";
+  const photographer = savedImage?.photographer || "Geranimo";
+  const profileURL =
+    savedImage?.profileURL || "https://unsplash.com/@geraninmo";
 
   //Updating background image
   document.body.style.backgroundImage = `url(${imageURL})`;
@@ -121,6 +143,7 @@ function favouriteLinks() {
   const startAddFavouriteBtn = document.querySelector("#addFavourite");
   const canselBtn = document.querySelector("#cancelButton");
   const addFavouriteBtn = document.querySelector("#addLinkButton");
+  const deleteFavLink = document.querySelector("#deleteFavLink");
 
   //if there are any saved notes in localStorage, they will be fetched.
   loadFavouriteLinks();
@@ -141,6 +164,23 @@ function favouriteLinks() {
   addFavouriteBtn.addEventListener("click", (event) =>
     createNewFavourite(event)
   );
+
+  //add event to delete links
+  favLinksDiv.addEventListener("click", (e) => {
+    if (e.target && e.target.id === "deleteFavLink") {
+      e.preventDefault(); // Stop the event that opens the link
+      e.stopPropagation(); // Stop the default-event from triggering other events
+
+      const linkItem = e.target.closest(".fav-link"); // Find the link closest to target
+      if (linkItem) {
+        const urlToRemove = linkItem.href; // fetch the url of the link to be removed
+        linkItem.remove(); // Remove the link from the DOM...
+
+        // UppdatelocalStorage
+        removeLinkFromLocalStorage(urlToRemove);
+      }
+    }
+  });
 }
 function createNewFavourite(event) {
   event.preventDefault(); // Förhindra formulärets submit
@@ -174,7 +214,7 @@ function addNewLinkDiv(url, linkName) {
         <img id="linkIcon" src="${favIconURL}" alt="${linkName}">
         <h3 id="linkTitle">${linkName}</h3>
       </div>
-      <span class="edit fa-solid fa-pen-to-square"></span>`;
+      <span id="deleteFavLink" class="fa-solid fa-trash"></span>`;
   newFavourite.href = url;
   newFavourite.target = "_blank"; //makesure the link is open in a new page
   newFavourite.classList.add("fav-link", "newContents");
@@ -214,6 +254,16 @@ function loadFavouriteLinks() {
     console.error("Kunde inte ladda länkar från localStorage:", error);
     localStorage.removeItem("favouriteLinks"); // Erase "korrupt" data
   }
+}
+
+function removeLinkFromLocalStorage(url) {
+  let savedLinks = JSON.parse(localStorage.getItem("favouriteLinks")) || [];
+
+  // Filter links that should be removed
+  savedLinks = savedLinks.filter((link) => link.url !== url);
+
+  // Uppdate localStorage
+  localStorage.setItem("favouriteLinks", JSON.stringify(savedLinks));
 }
 
 //funktionality for writing text in notes
