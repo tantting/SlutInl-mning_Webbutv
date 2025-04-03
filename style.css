@@ -127,7 +127,9 @@ footer {
 #selectBackground {
     position: fixed; /* positon the button fixed in the bottom ov the page */
     bottom: 20px;
-    left: 50%; /* Place the button in the middle and adjust for the size of the button with transform*/
+    left: 50%; 
+    /* Place the button in the middle with left: 50% and adjust the leftside placement with half the size 
+    of the element itself, using trasnform*/
     transform: translateX(-50%);
     background-color: rgba(223, 228, 224, 0.6);
     backdrop-filter: blur(2px);
@@ -415,10 +417,11 @@ color: rgba(223, 228, 224, 0.95);
     text-decoration: none;
 }
 #recipeSubContainer a h3 {
+    width: 80%;
     color: rgb(10, 26, 13);
     font-weight: 400;
     text-align: center;
-    font-size: 1em;
+    font-size: 0.9em;
     margin: 1.5rem 0 1rem 0;
 }
 
@@ -429,4 +432,10 @@ color: rgba(223, 228, 224, 0.95);
     -moz-border-radius: 5px;
     -ms-border-radius: 5px;
     -o-border-radius: 5px;
+}
+
+@media (max-width: 1050px) {
+    .headContainer {
+        padding: 0 15%;
+        }
 }

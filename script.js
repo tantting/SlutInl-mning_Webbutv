@@ -81,16 +81,23 @@ function changeHeading() {
 
   if (!heading) return;
 
+  const savedHeading = localStorage.getItem("savedHeading") || "Min Dashboard";
+
+  heading.innerText = savedHeading;
+
   heading.addEventListener("click", () => {
     const headingInput = document.createElement("input");
     headingInput.classList.add("headingInput");
+
     headingInput.value = heading.innerText;
+
     heading.parentNode.replaceChild(headingInput, heading);
     headingInput.focus();
 
     const saveChanges = () => {
-      heading.innerText = headingInput.value;
+      heading.innerText = headingInput.value || "...";
       headingInput.parentNode.replaceChild(heading, headingInput);
+      localStorage.setItem("savedHeading", heading.innerText);
     };
 
     headingInput.addEventListener("blur", saveChanges);
@@ -104,10 +111,6 @@ function changeHeading() {
 const modalContainer = document.querySelector(".modalContainer");
 const inputForm = document.querySelector("#addLinks");
 const favLinksDiv = document.querySelector("#links");
-
-// function saveLinks() {
-//   localStorage.setItem("favouriteLinks", favLinksDiv.value);
-// }
 
 function closeModal() {
   modalContainer.style.display = "none";
@@ -239,7 +242,7 @@ function notes() {
     notesCanvas.focus();
   });
 
-  //An event-listner that makes sure the nots are always saved.
+  //An event-listner that makes sure the notes are always saved.
   notesCanvas.addEventListener("input", () => {
     localStorage.setItem("dashboardNotes", notesCanvas.innerText);
   });
